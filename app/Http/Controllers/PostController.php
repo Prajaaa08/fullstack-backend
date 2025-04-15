@@ -4,9 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class PostController extends Controller
+class PostController extends Controller implements HasMiddleware
 {
+    /**
+     * Define the middleware for the controller.
+     */
+    public static function middleware()
+    {
+        return [
+            new Middleware ('auth:sanctum', except: ['index', 'show']),
+        ];
+    }
     /**
      * Display a listing of the resource.
      */
@@ -20,12 +31,12 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        $fields = $request->validate([
+        $validate = $request->validate([
             'title' => 'required|max:255',
             'body' => 'required'
         ]);
-        $post = Post::create($fields);
-
+        // $post = Post::create($fields);
+        $post = $request->user()->posts()->create($validate);
         return $post;
     }
 
