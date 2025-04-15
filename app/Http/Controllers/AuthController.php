@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class AuthController extends Controller
@@ -13,6 +14,14 @@ class AuthController extends Controller
             'email' => 'required|email|unique:users',
             'password' => 'required|confirmed',
         ]);
+
+        $user = User::create($validate);
+        $token = $user->createToken($request->name);
+
+        return [
+            'user' => $user,
+            'token' => $token->plainTextToken
+        ];
     }
     public function login(Request $request)
     {
